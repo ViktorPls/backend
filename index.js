@@ -1,36 +1,24 @@
-import express from 'express'
-import morgan from 'morgan'
-import fs from 'node:fs'
+import { app, PORT } from './constants.js'
+import { body, validationResult } from 'express-validator'
 
-// Constants or Configs //
-const PORT = process.env.PORT ?? 3000
-const app = express()
+app.post('/register',
+  body('email').trim().isEmail(),
+  body('name').trim().isString().isLength({ min: 3 }),
+  body('password').isString().isLength({ min: 6 }),
+  function (req, res) {
+    const result = validationResult(req)
+    if (!result.isEmpty()) return res.status(400).json({ errors: result.array() })
 
-// Settings oder Configs //
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
-app.use(express.urlencoded())
+    const { email, name, password } = req.body
 
-// app.METHOD(PATH, HANDLER) //
-app.get('/', function (req, res) {
-  res.sendFile('index.html', { root: './' })
-})
+    // Check if the email already exists in bdd
+    // TODO: Validate the request body
+    // TODO: Hash the password
+    // TODO: Save the user to the database
 
-app.post('/register', function (req, res) {
-  const { name, email, password } = req.body
-
-  const htmlStream =
-    fs.readFileSync('register.html', 'utf-8', (error, data) => {
-      if (error) {
-        console.log('Error:', error)
-        return
-      }
-      console.log('Data:', data)
-      return data
-    })
-  const htmlWithUserData = htmlStream.replace('{{ UserData }}', `Name: ${name}, Email: ${email}, Password: ${password}`)
-
-  res.send(htmlWithUserData)
-})
+    console.log(email, name, password)
+    res.send('User registered successfully')
+  })
 
 app.listen(PORT, () =>
   console.log(`Server is running on http://localhost:${PORT}`)
