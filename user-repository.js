@@ -1,5 +1,5 @@
 import { checkSchema } from 'express-validator'
-import { DATABASE } from './db.js'
+import { DATABASE } from './database/db.js'
 const registerSchema = checkSchema({
   name: {
     trim: true,
