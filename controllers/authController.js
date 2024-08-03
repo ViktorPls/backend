@@ -38,7 +38,10 @@ export const login = async (req, res) => {
     const { email, password } = req.body
 
     const result = await authenticateUser(email, password)
-    console.log('authController LOGIN FUNC', result)
+
+    if (result.errors) {
+      return res.status(401).json(result)
+    }
 
     res.status(200).json({ msg: 'User authenticated successfully', token: result.token })
   } catch (error) {
